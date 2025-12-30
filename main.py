@@ -2,7 +2,7 @@ from species import *
 from player import (
     register_or_login, save_game, reset_artifacts_to_pool, give_random_artifact
 )
-from artifacts import load_artifact_pool, generate_new_artifacts
+from artifacts import load_artifact_pool
 
 intro = (
     "МИР ГАДКИЙ Я. МИНЬОНЫ БЬЮТСЯ СО ЗЛОДЕЯМИ!\n"
@@ -32,83 +32,96 @@ def pre_battle(player):
         give_random_artifact(player)
 
 
+def defense_branch(player):
+    print("ЗАЩИТА БАЗЫ:")
+    choice = input("1-Артефакты? (1/другое): ").strip()
+    if choice == "1" and player.artifacts:
+        hitler.damage = int(hitler.damage * 0.6)
+        print("База укреплена артефактами!")
+
+
 def game_loop(player):
     print(intro)
 
     if player.storyline is None:
         choose_storyline(player)
 
-    # сюжетные ветки
+    # 3 сюжетные линии с ветвлениями
     if player.storyline == 1 or player.storyline == 2:
         pre_battle(player)
-    else:
-        print("ЗАЩИТА БАЗЫ:")
-        if input("1-Артефакты? (1/другое): ").strip() == "1" and player.artifacts:
-            hitler.damage = int(hitler.damage * 0.6)
+    elif player.storyline == 3:
+        defense_branch(player)
 
-    minions = {"1": kevin, "2": bob, "3": stuart, "кевин": kevin, "боб": bob, "стюарт": stuart}
+    # СПИСОК МИНЬОНОВ (словарь для выбора)
+    minions = {
+        "1": kevin,
+        "2": bob,
+        "3": stuart,
+        "кевин": kevin,
+        "боб": bob,
+        "стюарт": stuart
+    }
 
-    for i, m in enumerate([kevin, bob, stuart], 1):
-        print(i);
-        m.print_info();
+    # ПОКАЗЫВАЕМ СОСТОЯНИЕ МИНЬОНОВ (полиморфный print_info)
+    for i, minion in enumerate([kevin, bob, stuart], 1):
+        print(f"{i}:")
+        minion.print_info()
         print()
 
+    # ОСНОВНОЙ БОЕВОЙ ЦИКЛ С ПОЛИМОРФИЗМОМ
     while hitler.alive():
         print(f"Босс: {hitler.hp} хп | Артефакты: {player.artifacts}")
 
-        choice = input("Миньон: ").lower().strip()
+        # ВЫБОР МИНЬОНА
+        choice = input("Выберите миньона: ").lower().strip()
         if choice not in minions:
-            print("Нет такого!");
+            print("Нет такого миньона!")
             continue
 
         minion = minions[choice]
         if not minion.zhiv():
-            print("Мёртв!");
+            print(f"{minion.name} мёртв!")
             continue
 
-        # атаки (как в оригинале)
-        if minion.name == "Кевин":
-            print("1.1-Кулак 1.2-Пятая")
-        elif minion.name == "Боб":
-            print("2.1-Папайя 2.2-Вылизать")
-        else:
-            print("3.1-Бобо 3.2-Ауч")
+        # ПОЛИМОРФНОЕ МЕНЮ АТАК (каждый класс сам знает свои атаки)
+        print(f"\n{minion.name} ({minion.hp} хп):")
+        menu = minion.attack_menu()
+        for key, attack_name in menu.items():
+            print(f"  {key} - {attack_name}")
 
-        att = input().strip()
+        # ВЫБОР АТАКИ
+        attack_choice = input("Атака: ").strip()
 
-        if att == "1.1":
-            minion.hand(hitler, minion.damage, minion.strengh, minion.stiffness)
-        elif att == "1.2":
-            minion.butt(hitler, minion.damage, minion.dexterity, minion.stiffness)
-        elif att == "2.1":
-            minion.papaya(hitler, minion.damage, minion.idiocy)
-        elif att == "2.2":
-            minion.licking(hitler, minion.damage, minion.idiocy, minion.dexterity)
-        elif att == "3.1":
-            minion.bobo(hitler, stuart.damage, stuart.playfulness, stuart.strengh)
-        elif att == "3.2":
-            minion.augh(hitler, minion.damage, minion.playfulness)
-        else:
-            print("Пропуск!"); continue
+        # ПОЛИМОРФНОЕ ВЫПОЛНЕНИЕ АТАКИ (main.py НЕ ЗНАЕТ, КТО КОНКРЕТНО!)
+        minion.do_attack(attack_choice, hitler)
 
-        if not hitler.alive(): break
+        # ПРОВЕРКА ПОБЕДЫ
+        if not hitler.alive():
+            break
 
+        # ХОД БОССА
         hitler.attacking(minion, hitler.damage)
         print(f"{minion.name}: {minion.hp} хп")
 
-        if input("Сохранить? (y/n): ").lower() == "y":
+        # СОХРАНЕНИЕ (память игры)
+        if input("\nСохранить? (y/n): ").lower() == "y":
             save_game(player, hitler.hp)
 
-    print("ПОБЕДА!")
+    print("🎉 ПОБЕДА! Босс повержен! 🎉")
+
+    # НАГРАДА - АРТЕФАКТ
     give_random_artifact(player)
 
+    # ПРОВЕРКА НА ВСЕ АРТЕФАКТЫ (автогенерация новых)
     if player.has_all_artifacts():
+        from artifacts import generate_new_artifacts
         generate_new_artifacts()
-        print("НОВЫЕ АРТЕФАКТЫ!")
+        print("🔥 Все артефакты собраны! Сгенерированы НОВЫЕ! 🔥")
 
-    if input("Финальное сохранение? (y/n): ").lower() != "y":
+    # ФИНАЛЬНОЕ СОХРАНЕНИЕ
+    if input("\nФинальное сохранение? (y/n): ").lower() != "y":
         reset_artifacts_to_pool(player)
-        print("ПРОГРЕСС СГОРЕЛ!")
+        print("❌ ПРОГРЕСС СГОРЕЛ! Артефакты вернулись в копилку.")
 
 
 if __name__ == "__main__":

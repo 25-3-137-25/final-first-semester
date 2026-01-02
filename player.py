@@ -1,12 +1,12 @@
 import os
-import random  # ← ДОБАВИЛ ЭТОТ ИМПОРТ!
+import random
 from artifacts import load_artifact_pool, save_artifact_pool, generate_new_artifacts
 
 SAVE_FILE = "save.txt"
 USERS_FILE = "users.txt"
 
 
-class Player:
+class Player: #класс для игрока, который у нас пользуется игрой (пользователь)
     def __init__(self, username, artifacts=None, storyline=None):
         self.username = username
         self.artifacts = artifacts or []
@@ -24,7 +24,7 @@ class Player:
         return sorted(self.artifacts) == sorted(pool)
 
 
-def register_or_login():
+def register_or_login(): #реализованная регистрация и вход в акк
     users = {}
     if os.path.exists(USERS_FILE):
         with open(USERS_FILE, "r", encoding="utf-8") as f:
@@ -60,8 +60,8 @@ def register_or_login():
         return Player(login)
 
 
-def save_game(player, boss_hp):
-    boss_hp = int(boss_hp)  # ← привели к целому перед записью
+def save_game(player, boss_hp): # сохранение игры как раз
+    boss_hp = int(boss_hp)
     with open(SAVE_FILE, "w", encoding="utf-8") as f:
         f.write(f"{player.username}:{player.storyline}:{boss_hp}:")
         for art in player.artifacts:
@@ -70,7 +70,7 @@ def save_game(player, boss_hp):
     print("Сохранено.")
 
 
-def load_game(username):
+def load_game(username): #это загрузка сохранения, собственно
     if not os.path.exists(SAVE_FILE):
         return None
     with open(SAVE_FILE, "r", encoding="utf-8") as f:
@@ -82,7 +82,7 @@ def load_game(username):
             return None
 
         storyline = int(parts[1]) if parts[1].isdigit() else None
-        boss_hp = int(float(parts[2]))  # ← на всякий случай, если там всё ещё float-строка
+        boss_hp = int(float(parts[2]))
         artifacts = parts[3].split(";") if parts[3] else []
         artifacts = [a for a in artifacts if a]
 
@@ -91,7 +91,7 @@ def load_game(username):
         return player
 
 
-def reset_artifacts_to_pool(player):
+def reset_artifacts_to_pool(player): #это сброс артефактов, т.е. отправка их в пул уже
     pool = load_artifact_pool()
     for a in player.artifacts:
         if a not in pool:
@@ -100,7 +100,7 @@ def reset_artifacts_to_pool(player):
     player.remove_all_artifacts()
 
 
-def give_random_artifact(player):
+def give_random_artifact(player): #раздача рандомных артефактов в этой функции как раз
     pool = load_artifact_pool()
     candidates = [a for a in pool if a not in player.artifacts]
     if not candidates:
@@ -111,6 +111,6 @@ def give_random_artifact(player):
         player.add_artifact(artifact)
         print(f"Новый артефакт: {artifact}")
         return
-    artifact = random.choice(candidates)  # ← теперь random определён
+    artifact = random.choice(candidates)
     player.add_artifact(artifact)
     print(f"Найден артефакт: {artifact}")

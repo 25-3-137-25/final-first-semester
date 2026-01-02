@@ -1,3 +1,5 @@
+#почти всё здесь взято из второй лабы.
+#сначала прописываю класс хьюман для миньонов то есть играбельных персонажей
 class Human:
     def __init__(self, name, dexterity, level, strengh, hp, iq, damage):
         self.name = name
@@ -27,15 +29,13 @@ class Human:
     def take_damage(self, damage):
         self.hp -= damage
 
-    # БАЗОВЫЙ ПОЛИМОРФНЫЙ ИНТЕРФЕЙС (переопределяется в дочерних)
     def attack_menu(self):
-        # по умолчанию нет атак, должен быть переопределён
         return {}
 
     def do_attack(self, choice, target):
-        # базовая реализация ничего не делает
         print("Этот персонаж не умеет атаковать так.")
-class leader(Human):
+
+class leader(Human): #это дочерний класс лидер для кевина
     def __init__(self, name, dexterity, damage, stiffness, strengh,
                  level=19, hp=125, iq=140):
         super().__init__(name, dexterity, level, strengh, hp, iq, damage)
@@ -51,7 +51,7 @@ class leader(Human):
         target.take_damage(dmg)
         print(f"{self.name} толкнул пятой точкой {target.name}, нанеся {dmg} урона")
 
-    # ПОЛИМОРФНЫЕ МЕТОДЫ
+    #тут я реализую полиморфизм а то раньше с этим проблема была
     def attack_menu(self):
         return {
             "1": "Удар кулаком",
@@ -65,7 +65,7 @@ class leader(Human):
             self.butt(target)
         else:
             print("Такой атаки нет.")
-class funny(Human):
+class funny(Human): #класс фанни от хьюмана (дочерний)
     def __init__(self, name, idiocy, damage, dexterity,
                  level=10, strengh=1, hp=88, iq=1):
         super().__init__(name, dexterity, level, strengh, hp, iq, damage)
@@ -94,7 +94,7 @@ class funny(Human):
             self.licking(target)
         else:
             print("Такой атаки нет.")
-class playful(Human):
+class playful(Human): #и еще один дочерний класс от хьюман
     def __init__(self, name, playfulness, damage, dexterity,
                  level=13, strengh=20, hp=100, iq=15):
         super().__init__(name, dexterity, level, strengh, hp, iq, damage)

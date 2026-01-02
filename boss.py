@@ -1,6 +1,6 @@
 from party import *
-
-class Boss:
+#файлик почти весь из второй лабы для босса
+class Boss: #класс для босса
     def __init__(self, name, level, hp, damage):
         self.name = name
         self.level = level

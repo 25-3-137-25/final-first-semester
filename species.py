@@ -1,6 +1,6 @@
 from party import *
 from boss import *
-
+#этот файл ответственнен за распределение классов между персонажами и боссом
 kevin = leader(name = "Кевин", dexterity = 50, damage = 50, stiffness = 35, strengh = 60)
 bob = funny( name = "Боб", idiocy = 70, dexterity= 30, damage = 15)
 stuart = playful(name = "Стюарт", playfulness = 50, damage = 50, dexterity = 30, level = 13)

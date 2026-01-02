@@ -61,6 +61,7 @@ def register_or_login():
 
 
 def save_game(player, boss_hp):
+    boss_hp = int(boss_hp)  # ← привели к целому перед записью
     with open(SAVE_FILE, "w", encoding="utf-8") as f:
         f.write(f"{player.username}:{player.storyline}:{boss_hp}:")
         for art in player.artifacts:
@@ -81,12 +82,12 @@ def load_game(username):
             return None
 
         storyline = int(parts[1]) if parts[1].isdigit() else None
-        boss_hp = int(parts[2])
+        boss_hp = int(float(parts[2]))  # ← на всякий случай, если там всё ещё float-строка
         artifacts = parts[3].split(";") if parts[3] else []
         artifacts = [a for a in artifacts if a]
 
         player = Player(username, artifacts, storyline)
-        print(f"Загружен прогресс: {len(artifacts)} артефактов")
+        print(f"Загружен прогресс: {len(artifacts)} артефактов, HP босса: {boss_hp}")
         return player
 
 

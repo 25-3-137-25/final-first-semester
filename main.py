@@ -2,7 +2,7 @@ from species import *
 from player import (
     register_or_login, save_game, reset_artifacts_to_pool, give_random_artifact
 )
-from artifacts import load_artifact_pool
+from artifacts import *
 
 intro = (
     "МИР ГАДКИЙ Я. МИНЬОНЫ БЬЮТСЯ СО ЗЛОДЕЯМИ!\n"
